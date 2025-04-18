@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  go-postgres:
+    container_name: go-postgres
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      - ENV=DEV
+    networks:
+      - go-postgres-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=gopostgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=go_postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - go-postgres-net
+
+volumes:
+  postgres_data:
+    external: false
+
+networks:
+  go-postgres-net:
+    name: go-postgres-net
